@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es6",
+    "baseUrl": "./src",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "paths": {
+      "@src/*": [
+        "*"
+      ],
+      "@engine/*": [
+        "engine/*"
+      ],
+      "@core/*": [
+        "engine/core/*"
+      ],
+    }
+  },
+  "exclude": [
+    "node_modules"
+  ],
+}
