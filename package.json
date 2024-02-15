@@ -31,6 +31,7 @@
 		"lit-html": "^3.1.2",
 		"mini-css-extract-plugin": "^2.8.0",
 		"module-alias": "^2.2.3",
+		"sass": "^1.70.0",
 		"three-gltf-loader": "^1.111.0",
 		"three-js": "^79.0.0",
 		"tween.js": "^16.6.0",
