@@ -4,7 +4,7 @@ import postcss from "rollup-plugin-postcss";
 import postcssUrl from "postcss-url";
 import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
-import url from 'rollup-plugin-url';
+import url from "rollup-plugin-url";
 export default {
 	input: "src/index.ts",
 	output: {
@@ -37,6 +37,7 @@ export default {
 			tsconfig: "tsconfig.json",
 		}),
 		url(),
+		url({ fileName: "[name][extname]", include: ["**/assets/*.mp3"], limit: 100000 }),
 		postcss({
 			extract: true,
 			minimize: true,

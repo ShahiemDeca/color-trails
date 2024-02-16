@@ -1,11 +1,12 @@
 import GameModeScreen from "@src/gui/GameModeScreen";
 import { render } from "lit-html";
-import { Scene, PerspectiveCamera, WebGLRenderer, Vector2, Raycaster, DirectionalLight, AmbientLight, Mesh } from 'three';
+import { Scene, PerspectiveCamera, WebGLRenderer, Vector2, Raycaster, Audio, AudioListener, AudioLoader, DirectionalLight, AmbientLight, Mesh } from 'three';
 import config from '../../config';
 import Cylinder from "../entity/Cylinder";
 import Ball from "../entity/Ball";
 import Platform from "../entity/Platform";
 import Score from "./Score";
+import hyper from '../../assets/hyper.mp3';
 
 class TouchEvent {
   static SWIPE_THRESHOLD = 0; // Minimum difference in pixels at which a swipe gesture is detected
@@ -107,14 +108,34 @@ export default class GameMode {
     this.platforms = new Platform();
     this.ball = new Ball();
     this.gameModeScreen = new GameModeScreen();
+
+    // const sound = new Howl({
+    //   src: ['../../assets/hyper.mp3'],
+    //   volume: 0.4
+    // });
+
+    const listener = new AudioListener();
+    this.camera.add(listener);
+
+
+    const sound = new Audio(listener);
+
+    const audioLoader = new AudioLoader();
+    audioLoader.load(hyper, function (buffer) {
+      sound.setBuffer(buffer);
+      sound.setLoop(true);
+      sound.setVolume(0.5);
+      sound.play();
+    });
+
   }
 
-  public startDragging(event: any) {
+  public startDragging(event: TouchEvent) {
     this.isPlatformRotating = true;
     this.touchEvent = new TouchEvent(event, null);
   }
 
-  public stopDragging(event: any) {
+  public stopDragging() {
     this.isPlatformRotating = false;
   }
 
@@ -244,6 +265,9 @@ export default class GameMode {
   }
 
   public start() {
+
+    // sound.play();
+
     this.setGameInterface();
     this.setEventListners();
     this.setCamera();

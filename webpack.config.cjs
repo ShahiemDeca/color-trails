@@ -15,6 +15,13 @@ module.exports = (env, argv) => {
 		module: {
 			rules: [
 				{
+					test: /\.mp3$/,
+					loader: "file-loader",
+					options: {
+							name: "audio/[name].[ext]",
+					},
+			},
+				{
 					test: /\.tsx?$/,
 					use: "ts-loader",
 					exclude: /node_modules/,
