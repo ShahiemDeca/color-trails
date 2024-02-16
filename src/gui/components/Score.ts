@@ -1,7 +1,7 @@
 import { LitElement, html, render } from "lit";
 import { customElement, property } from 'lit/decorators.js';
-import { HighScore } from "../HighScore";
 import { PauseScreen } from "../PauseScreen";
+import settings from '../../assets/settings.png';
 
 @customElement('my-score')
 class Score extends LitElement {
@@ -10,7 +10,7 @@ class Score extends LitElement {
   render() {
     return html`
       <div class="header">
-        <div @click=${this.onPause} class="wheel"><img src="assets/settings.png" alt="Pause"></div>
+        <div @click=${this.onPause} class="wheel"><img src=${settings} alt="Pause"></div>
         <div class="level">${this.score}</div>
       </div>
     `;

@@ -1,6 +1,7 @@
 import { LitElement, html } from "lit";
 import { customElement } from 'lit/decorators.js';
 import GameMode from "@src/engine/scenes/GameMode";
+import logo from '../assets/logo.png';
 
 @customElement('home-screen')
 export class HomeScreen extends LitElement {
@@ -9,8 +10,7 @@ export class HomeScreen extends LitElement {
     return html`
     <div class="app">
       <div class="container">
-        <img src="assets/logo.png" alt="Logo">
-
+        <img src="${logo}" alt="Logo">
         <div class="button-list">
           <button @click=${this.onSelectGameMode}><span>Match</span></button>
           <button @click=${this.onSelectGameMode}><span>Brains</span></button>

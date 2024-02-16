@@ -38,6 +38,7 @@ export default class GameMode {
   }
 
   public startDragging() {
+    alert('test')
     this.isPlatformRotating = true;
   }
 
