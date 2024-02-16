@@ -228,14 +228,10 @@ export default class GameMode {
   }
 
   public movePlatform(event: any) {
-    // const platform = this.platformUnderMouse(event.clientX, event.clientY);
-    // if (!platform) return;
     this.touchEvent.setEndEvent(event);
 
+    const sensitivity = 0.2;
     this.platforms.obstacles.forEach(element => {
-
-
-      const sensitivity = 0.05;
       if (this.touchEvent.isSwipeRight()) {
         element.rotation.y += sensitivity * 1;
       } else if (this.touchEvent.isSwipeLeft()) {
