@@ -17,7 +17,7 @@ export default class Ball {
     });
 
     const entity = new Mesh(geometry, material);
-    entity.position.set(0, this.startPositionY, 10);
+    entity.position.set(1, this.startPositionY, 10);
 
     this.entity = entity;
     scene.add(entity);

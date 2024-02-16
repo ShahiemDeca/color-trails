@@ -46,6 +46,7 @@ export default class Platform {
       const platformMaterial = new MeshPhongMaterial({ color: shuffledColors[i] });
       const platformMesh = new Mesh(platformGeometry, platformMaterial);
       const platform = new Object3D();
+
       platform.add(platformMesh);
 
       Object.assign(platform, platformInfo);

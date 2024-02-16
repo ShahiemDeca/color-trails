@@ -9,7 +9,7 @@ export class SplashScreen extends LitElement {
     return html`
       <div class="app is-splash">
         <div class="container">
-          <img src="${logo}" alt="Logo">
+          <img src="${logo}" alt="Logo" class="logo">
           <span class="loading">loading</span>
         </div>
       </div>

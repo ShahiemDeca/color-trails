@@ -28,6 +28,8 @@ export default class GameModeScreen extends LitElement {
         ${this.renderHearts()}
       </div>
       <my-score score=${this.score}></my-score>
+
+      <div class="footer">Tap to move the platform</div>
     </div>
     `;
   }

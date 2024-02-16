@@ -33,8 +33,8 @@ export default class GameMode {
 
   private readonly mismatchesThreshold: number = 3;
   private audio: Audio;
-  touchStartX: any;
-  touchStartY: any;
+  private touchStartX: number = 0;
+  private touchStartY: number = 0;
 
   constructor() {
     this.scene = new Scene();
@@ -69,24 +69,22 @@ export default class GameMode {
   }
 
   public stopDragging(event: any) {
-    this.isPlatformRotating = false;
-
     // Calculate the distance moved during the touch
     const touchEndX = event.changedTouches[0].clientX;
     const touchEndY = event.changedTouches[0].clientY;
     const distanceX = touchEndX - this.touchStartX;
     const distanceY = touchEndY - this.touchStartY;
 
-    // Check if the touch was a tap (small movement)
-    const tapThreshold = 5; // Adjust this threshold based on your needs
+    // Check if the touch was a tap
+    const tapThreshold = 5;
     if (Math.abs(distanceX) < tapThreshold && Math.abs(distanceY) < tapThreshold) {
-      // It's a tap, handle the tap event
       this.handleTap();
     }
 
     // Reset the initial touch position
     this.touchStartX = null;
     this.touchStartY = null;
+    this.isPlatformRotating = false;
   }
 
   private handleTap() {
@@ -114,7 +112,6 @@ export default class GameMode {
     // Touch events for mobile devices
     document.addEventListener('touchstart', this.startDragging.bind(this));
     document.addEventListener('touchend', this.stopDragging.bind(this));
-    document.addEventListener('touchmove', this.movePlatform.bind(this));
   }
 
   public toggleQuit() {
@@ -206,8 +203,15 @@ export default class GameMode {
     this.platforms.render({ amount, scene: this.scene });
   }
 
-  public movePlatform(event: any) {
+  public addLights() {
+    // Add directional light to the scene
+    const light = new DirectionalLight(0xffffff, 10);
+    light.position.set(1, 1, 1);
+    this.scene.add(light);
 
+    // Add ambient light to the scene
+    const ambientLight = new AmbientLight(0xffffff, 1);
+    this.scene.add(ambientLight);
   }
 
   public onGameEnd() {
@@ -231,14 +235,8 @@ export default class GameMode {
     this.addCylinder();
     this.addBall();
     this.addPlatform({ amount: 4 });
+    this.addLights();
 
-    const light = new DirectionalLight(0xffffff, 10);
-    light.position.set(1, 1, 1);
-    this.scene.add(light);
-
-    // Add ambient light
-    const ambientLight = new AmbientLight(0xffffff, 1);
-    this.scene.add(ambientLight);
     // Game loop
     this.update(performance.now());
   }
@@ -258,9 +256,9 @@ export default class GameMode {
 
     if (this.ball?.isBallDropping) {
       const currentScore = this.gameModeScreen.score;
-      const increasedSpeed = 0.01 * Math.floor(currentScore / 5); // Increase speed every 5 points
+      const increasedSpeed = 0.01 * Math.floor(currentScore / 10); // Increase speed every 10 points
       const totalSpeed = increasedSpeed + this.ballSpeed;
-      const increasedFallDelay = 0.01 * Math.floor(currentScore / 5); // Increase delay every 10 points
+      const increasedFallDelay = 0.01 * Math.floor(currentScore / 10); // Increase delay every 10 points
       this.initialBallFallDelay = this.initialBallFallDelay - increasedFallDelay;
 
       this.ball.drop(totalSpeed);

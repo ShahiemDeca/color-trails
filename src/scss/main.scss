@@ -220,3 +220,20 @@ button {
   display: flex;
   justify-content: flex-end;
 }
+
+.logo {
+  max-width: 300px;
+}
+
+.footer {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 10px;
+  background-color: #ffffffc7;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  color: #000000;
+}

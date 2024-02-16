@@ -10,7 +10,7 @@ export class HomeScreen extends LitElement {
     return html`
     <div class="app">
       <div class="container">
-        <img src="${logo}" alt="Logo">
+        <img src="${logo}" alt="Logo" class="logo">
         <div class="button-list">
           <button @click=${this.onSelectGameMode}><span>Play game</span></button>
         </div>
