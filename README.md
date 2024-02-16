@@ -19,19 +19,19 @@ To get started to run Color Trails, follow these steps:
 2. cd color-trails
 
 3. Install the project dependencies
-```bash
+   ```bash
 npm install
 
 ## Development
 
 For development, you can run the project in a development environment using the following command:
 
-```bash
-npm run dev
+   ```bash
+   npm run dev
 
 ## Build
 
 To build the project for production, execute the following command:
 
-```bash
+   ```bash
 npm run build
