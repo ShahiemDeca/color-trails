@@ -38,7 +38,6 @@ export default class GameMode {
   }
 
   public startDragging() {
-    alert('test')
     this.isPlatformRotating = true;
   }
 
@@ -165,8 +164,9 @@ export default class GameMode {
 
     const platformCenterX = (platform.position.x + platform.geometry.parameters.width) / 2;
     const mouseDirection = (event.clientX - platformCenterX) > 0 ? 1 : -1;
-
+alert(1)
     if (this.isPlatformRotating) {
+      alert(2)
       const sensitivity = 0.03; // Adjust the sensitivity for rotation
       const deltaRotation = (event.movementX || event.mozMovementX || event.webkitMovementX || 0) * sensitivity;
 
