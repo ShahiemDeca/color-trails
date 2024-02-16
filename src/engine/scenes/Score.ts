@@ -7,6 +7,6 @@ export default class Score {
     const highscore = new HighScore();
     highscore.updateScore(score);
 
-    render(highscore, document.getElementById('#app'));
+    render(highscore, document.getElementById('app'));
   }
 }

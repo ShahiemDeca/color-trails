@@ -1,5 +1,5 @@
 import config from '@src/config';
-import * as THREE from 'three';
+import { MeshPhongMaterial, Scene, Mesh, CylinderGeometry, Group, Object3D } from 'three';
 
 interface PlatformInfo {
   positionY: number;
@@ -23,8 +23,8 @@ export default class Platform {
     return platforms;
   }
 
-  private createPlatformObstacles(platformInfo: PlatformInfo): THREE.Group {
-    const obstaclesGroup = new THREE.Group();
+  private createPlatformObstacles(platformInfo: PlatformInfo): Group {
+    const obstaclesGroup = new Group();
     const numberOfPieces = config.colors.length;
     const piePieceAngle = (Math.PI * 2) / numberOfPieces;
     const shuffledColors = config.colors
@@ -35,7 +35,7 @@ export default class Platform {
     for (let i = 0; i < numberOfPieces; i++) {
       const startingAngle = i * piePieceAngle;
 
-      const platformGeometry = new THREE.CylinderGeometry(
+      const platformGeometry = new CylinderGeometry(
         config.platformStye.radius,
         config.platformStye.radius,
         config.platformStye.height,
@@ -46,9 +46,9 @@ export default class Platform {
         piePieceAngle
       );
 
-      const platformMaterial = new THREE.MeshPhongMaterial({ color: shuffledColors[i] });
-      const platformMesh = new THREE.Mesh(platformGeometry, platformMaterial);
-      const platform = new THREE.Object3D();
+      const platformMaterial = new MeshPhongMaterial({ color: shuffledColors[i] });
+      const platformMesh = new Mesh(platformGeometry, platformMaterial);
+      const platform = new Object3D();
       platform.userData.index = obstaclesGroup.children.length;
       platform.add(platformMesh);
       Object.assign(platform, platformInfo);
@@ -66,7 +66,7 @@ export default class Platform {
     this.obstacles.forEach((platform: any) => platform.position.y += config.platformStye.gap);
   }
 
-  public removeFirst(scene: THREE.Scene) {
+  public removeFirst(scene: Scene) {
     if(this.obstacles.length === 0) return;
     
     scene.remove(this.obstacles[0]);
@@ -75,7 +75,7 @@ export default class Platform {
     this.obstacles.shift();
   }
 
-  public render({ amount, scene }: { amount: number; scene: THREE.Scene }) {
+  public render({ amount, scene }: { amount: number; scene: Scene }) {
     const platformInfos = this.createPlatformInfo(amount);
     platformInfos.forEach((platformInfo) => {
       const obstaclesGroup = this.createPlatformObstacles(platformInfo);

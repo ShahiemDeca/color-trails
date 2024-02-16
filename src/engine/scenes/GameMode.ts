@@ -1,6 +1,6 @@
 import GameModeScreen from "@src/gui/GameModeScreen";
 import { render } from "lit-html";
-import * as THREE from 'three';
+import { Scene, PerspectiveCamera, WebGLRenderer, Vector2, Raycaster, DirectionalLight, AmbientLight, Mesh } from 'three';
 import config from '../../config';
 import Cylinder from "../entity/Cylinder";
 import Ball from "../entity/Ball";
@@ -15,11 +15,11 @@ export default class GameMode {
 
   private ballSpeed: number = 0.2;
   private initialBallFallDelay: number = config.ballFallDelay; // Initial ball fall delay
-  private scene: THREE.Scene;
-  private camera: THREE.PerspectiveCamera;
-  private renderer: THREE.WebGLRenderer;
+  private scene: Scene;
+  private camera: PerspectiveCamera;
+  private renderer: WebGLRenderer;
   private startTime: number = performance.now();
-  private ball: THREE.Mesh;
+  private ball: Mesh;
   private platforms: Platform;
   isPaused: boolean = false;
 
@@ -29,10 +29,9 @@ export default class GameMode {
   isGameEnded: boolean = false;
 
   constructor() {
-    this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-
+    this.scene = new Scene();
+    this.camera = new PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
     this.platforms = new Platform();
     this.ball = new Ball();
     this.gameModeScreen = new GameModeScreen();
@@ -81,7 +80,7 @@ export default class GameMode {
 
   public toggleReset() {
     if (!this.isGameEnded) return;
-    
+
     // Reset the game state
     this.isGameEnded = false;
     this.isPaused = false;
@@ -124,7 +123,7 @@ export default class GameMode {
   }
 
   public setGameInterface() {
-    render(this.gameModeScreen, document.getElementById('#app'));
+    render(this.gameModeScreen, document.getElementById('app'));
   }
 
   public setRenderer() {
@@ -146,11 +145,11 @@ export default class GameMode {
   }
 
   public platformUnderMouse(clientX: number, clientY: number) {
-    const mouse = new THREE.Vector2();
+    const mouse = new Vector2();
     mouse.x = (clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
-    const raycaster = new THREE.Raycaster();
+    const raycaster = new Raycaster();
     raycaster.setFromCamera(mouse, this.camera);
 
     const intersects = raycaster.intersectObjects(this.platforms.obstacles);
@@ -197,12 +196,12 @@ export default class GameMode {
     this.addBall();
     this.addPlatform({ amount: 4 });
 
-    const light = new THREE.DirectionalLight(0xffffff, 10);
+    const light = new DirectionalLight(0xffffff, 10);
     light.position.set(1, 1, 1);
     this.scene.add(light);
 
     // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    const ambientLight = new AmbientLight(0xffffff, 1);
     this.scene.add(ambientLight);
     // Game loop
     this.update(performance.now());

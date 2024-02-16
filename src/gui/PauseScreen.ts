@@ -34,7 +34,7 @@ export class PauseScreen extends LitElement {
     document.dispatchEvent(new CustomEvent('quit-game'));
 
     const homeScreen = new HomeScreen();
-    render(homeScreen, document.getElementById('#app'));
+    render(homeScreen, document.getElementById('app'));
   }
 
 }

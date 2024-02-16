@@ -6,13 +6,13 @@ export default class Splash {
 
   public start() {
     const homescreen = new SplashScreen();
-    render(homescreen, document.getElementById('#app'));
+    render(homescreen, document.getElementById('app'));
   }
 
   public addFakeLoader() {
     setTimeout(() => {
       const homescreen = new HomeScreen();
-      render(homescreen, document.getElementById('#app'));
+      render(homescreen, document.getElementById('app'));
     }, 2000);
   }
 

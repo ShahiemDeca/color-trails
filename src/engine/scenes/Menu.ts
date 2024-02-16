@@ -5,7 +5,7 @@ export default class Menu {
 
   public start() {
     const homescreen = new HomeScreen();
-    render(homescreen, document.getElementById('#app'));
+    render(homescreen, document.getElementById('app'));
   }
 
 }

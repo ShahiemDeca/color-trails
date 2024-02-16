@@ -1,5 +1,5 @@
 import config from '@src/config';
-import * as THREE from 'three';
+import { MeshPhongMaterial, SphereGeometry, Scene, Mesh, Color, Vector3, Sphere, Raycaster } from 'three';
 
 export default class Ball {
 
@@ -10,14 +10,14 @@ export default class Ball {
   public isFirstFall: boolean = true;
   public isMatch: boolean = false;
 
-  public render(scene: THREE.Scene) {
-    const geometry = new THREE.SphereGeometry(3, 10, 32);
-    const material = new THREE.MeshPhongMaterial({
+  public render(scene: Scene) {
+    const geometry = new SphereGeometry(3, 10, 32);
+    const material = new MeshPhongMaterial({
       color: config.colors[Math.floor(Math.random() * config.colors.length)],
     });
 
-    console.log( config.colors[Math.floor(Math.random() * config.colors.length)])
-    const entity = new THREE.Mesh(geometry, material);
+    console.log(config.colors[Math.floor(Math.random() * config.colors.length)])
+    const entity = new Mesh(geometry, material);
     entity.position.set(0, this.startPositionY, 10);
 
     this.entity = entity;
@@ -47,7 +47,7 @@ export default class Ball {
 
   public changeColor() {
     const color = config.colors[Math.floor(Math.random() * config.colors.length)];
-    this.entity.material.color.set(new THREE.Color(color));
+    this.entity.material.color.set(new Color(color));
   }
 
   public handlePlatformCollision({ platforms, scene }: { platforms: any, scene: any }) {
@@ -63,16 +63,16 @@ export default class Ball {
       this.entity.position.y = platformPosition + 3;
 
       // Handle intersection with platform
-      const ballPosition = new THREE.Vector3();
+      const ballPosition = new Vector3();
       this.entity.getWorldPosition(ballPosition);
 
-      const ballBoundingSphere = new THREE.Sphere(ballPosition, this.entity.geometry.parameters.radius);
+      const ballBoundingSphere = new Sphere(ballPosition, this.entity.geometry.parameters.radius);
 
-      const raycaster = new THREE.Raycaster();
-      raycaster.set(ballBoundingSphere.center, new THREE.Vector3(0, -1, 0));
+      const raycaster = new Raycaster();
+      raycaster.set(ballBoundingSphere.center, new Vector3(0, -1, 0));
 
       const intersectsLeft = raycaster.intersectObjects(obstacles);
-      raycaster.set(ballBoundingSphere.center, new THREE.Vector3(-1, -1, 0));
+      raycaster.set(ballBoundingSphere.center, new Vector3(-1, -1, 0));
 
       const intersectsRight = raycaster.intersectObjects(obstacles);
 

@@ -24,6 +24,6 @@ class Score extends LitElement {
     document.dispatchEvent(new CustomEvent('pause-game'));
 
     const pauseScreen = new PauseScreen();
-    render(pauseScreen, document.getElementById('#app'));
+    render(pauseScreen, document.getElementById('app'));
   }
 }
