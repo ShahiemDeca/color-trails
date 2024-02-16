@@ -116,8 +116,6 @@ export default class GameMode {
 
   public stopDragging(event: any) {
     this.isPlatformRotating = false;
-
-
   }
 
   public setEventListners() {
@@ -222,15 +220,10 @@ export default class GameMode {
     this.platforms.render({ amount, scene: this.scene });
   }
 
-  public platformUnderMouse(clientX: number, clientY: number) {
-
-    return this.platforms.obstacles[0];
-  }
-
   public movePlatform(event: any) {
     this.touchEvent.setEndEvent(event);
 
-    const sensitivity = 0.2;
+    const sensitivity = 0.1;
     this.platforms.obstacles.forEach(element => {
       if (this.touchEvent.isSwipeRight()) {
         element.rotation.y += sensitivity * 1;
@@ -292,7 +285,7 @@ export default class GameMode {
       const increasedFallDelay = 0.01 * Math.floor(currentScore / 5); // Increase delay every 10 points
       this.initialBallFallDelay = this.initialBallFallDelay - increasedFallDelay;
 
-      // this.ball.drop(totalSpeed);
+      this.ball.drop(totalSpeed);
       this.ball.handlePlatformCollision({ platforms: this.platforms, scene: this.scene });
 
       if (this.ball.isIntersected) {
