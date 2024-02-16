@@ -52,6 +52,9 @@ export default class GameMode {
     document.addEventListener('pause-game', this.togglePause.bind(this));
     document.addEventListener('reset-game', this.toggleReset.bind(this));
     document.addEventListener('quit-game', this.toggleQuit.bind(this));
+    document.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+    }, { passive: false });
 
     // Events for desktop
     // document.addEventListener('mousedown', this.startDragging.bind(this));
@@ -59,9 +62,9 @@ export default class GameMode {
     // document.addEventListener('mousemove', this.movePlatform.bind(this));
 
     // Touch events for mobile devices
-    document.addEventListener('touchstart', this.startDragging.bind(this), { passive: false });
-    document.addEventListener('touchend', this.stopDragging.bind(this), { passive: false });
-    document.addEventListener('touchmove', this.movePlatform.bind(this), { passive: false });
+    document.addEventListener('touchstart', this.startDragging.bind(this));
+    document.addEventListener('touchend', this.stopDragging.bind(this));
+    document.addEventListener('touchmove', this.movePlatform.bind(this));
   }
 
   public toggleQuit() {
@@ -155,31 +158,12 @@ export default class GameMode {
     // Check if platform is not undefined
     if (platform) {
       const platformCenterX = window.innerWidth / 2;
-      const mouseDirection = (event.touches[0].clientX  - platformCenterX) > 0 ? 1 : -1;
+      const mouseDirection = (event.touches[0].clientX - platformCenterX) > 0 ? 1 : -1;
 
-      console.log(mouseDirection)
       const sensitivity = 0.06; // Adjust the sensitivity for rotation
-
-      // Check if platform.rotation is not NaN before updating
-        platform.rotation.y += sensitivity * mouseDirection;
-
-      //   console.log(-mouseDirection)
-      // }
+      platform.rotation.y += sensitivity * mouseDirection;
     }
 
-    //     const platform = this.platformUnderMouse(event.clientX, event.clientY);
-    //     // if (!platform) return;
-    // console.log(platform)
-    //     const platformCenterX = (platform.position.x + window.innerWidth) / 2;
-    //     const mouseDirection = (event.clientX - platformCenterX) > 0 ? 1 : -1;
-    //     // if (this.isPlatformRotating) {
-    //       const sensitivity = 0.03; // Adjust the sensitivity for rotation
-    //       const deltaRotation = (event.movementX || event.mozMovementX || event.webkitMovementX || 0) * sensitivity;
-
-    //       //   if (this.platforms.obstacles[0]) 
-    //       platform.rotation.y += deltaRotation * -mouseDirection;
-    //       // }
-    //     // }
   }
 
   public onGameEnd() {
