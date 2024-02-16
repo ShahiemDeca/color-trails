@@ -7,6 +7,77 @@ import Ball from "../entity/Ball";
 import Platform from "../entity/Platform";
 import Score from "./Score";
 
+class TouchEvent {
+  static SWIPE_THRESHOLD = 50; // Minimum difference in pixels at which a swipe gesture is detected
+
+  static SWIPE_LEFT = 1;
+  static SWIPE_RIGHT = 2;
+  static SWIPE_UP = 3;
+  static SWIPE_DOWN = 4;
+  startEvent: any;
+  endEvent: any;
+
+  constructor(startEvent, endEvent) {
+    this.startEvent = startEvent;
+    this.endEvent = endEvent || null;
+  }
+
+  isSwipeLeft() {
+    return this.getSwipeDirection() == TouchEvent.SWIPE_LEFT;
+  }
+
+  isSwipeRight() {
+    return this.getSwipeDirection() == TouchEvent.SWIPE_RIGHT;
+  }
+
+  isSwipeUp() {
+    return this.getSwipeDirection() == TouchEvent.SWIPE_UP;
+  }
+
+  isSwipeDown() {
+    return this.getSwipeDirection() == TouchEvent.SWIPE_DOWN;
+  }
+
+  getSwipeDirection() {
+    if (!this.startEvent.changedTouches || !this.endEvent.changedTouches) {
+      return null;
+    }
+
+    let start = this.startEvent.changedTouches[0];
+    let end = this.endEvent.changedTouches[0];
+
+    if (!start || !end) {
+      return null;
+    }
+
+    let horizontalDifference = start.screenX - end.screenX;
+    let verticalDifference = start.screenY - end.screenY;
+
+    // Horizontal difference dominates
+    if (Math.abs(horizontalDifference) > Math.abs(verticalDifference)) {
+      if (horizontalDifference >= TouchEvent.SWIPE_THRESHOLD) {
+        return TouchEvent.SWIPE_LEFT;
+      } else if (horizontalDifference <= -TouchEvent.SWIPE_THRESHOLD) {
+        return TouchEvent.SWIPE_RIGHT;
+      }
+
+      // Vertical or no difference dominates
+    } else {
+      if (verticalDifference >= TouchEvent.SWIPE_THRESHOLD) {
+        return TouchEvent.SWIPE_UP;
+      } else if (verticalDifference <= -TouchEvent.SWIPE_THRESHOLD) {
+        return TouchEvent.SWIPE_DOWN;
+      }
+    }
+
+    return null;
+  }
+
+  setEndEvent(endEvent) {
+    this.endEvent = endEvent;
+  }
+}
+
 export default class GameMode {
 
   public ballStartPositionY: number = 20;
@@ -27,6 +98,7 @@ export default class GameMode {
   private mismatchesCount: number = 0;
   private readonly mismatchesThreshold: number = 3;
   isGameEnded: boolean = false;
+  touchEvent: TouchEvent;
 
   constructor() {
     this.scene = new Scene();
@@ -37,12 +109,15 @@ export default class GameMode {
     this.gameModeScreen = new GameModeScreen();
   }
 
-  public startDragging() {
+  public startDragging(event: any) {
     this.isPlatformRotating = true;
+    this.touchEvent = new TouchEvent(event, null);
   }
 
-  public stopDragging() {
+  public stopDragging(event: any) {
     this.isPlatformRotating = false;
+
+
   }
 
   public setEventListners() {
@@ -153,16 +228,20 @@ export default class GameMode {
   }
 
   public movePlatform(event: any) {
-    const platform = this.platformUnderMouse(event.clientX, event.clientY);
+    // const platform = this.platformUnderMouse(event.clientX, event.clientY);
+    // if (!platform) return;
 
-    // Check if platform is not undefined
-    if (platform) {
-      const platformCenterX = window.innerWidth / 2;
-      const mouseDirection = (event.touches[0].clientX - platformCenterX) > 0 ? 1 : -1;
+    this.platforms.obstacles.forEach(element => {
 
-      const sensitivity = 0.06; // Adjust the sensitivity for rotation
-      platform.rotation.y += sensitivity * mouseDirection;
-    }
+      this.touchEvent.setEndEvent(event);
+
+      const sensitivity = 0.07;
+      if (this.touchEvent.isSwipeRight()) {
+        element.rotation.y += sensitivity * 1;
+      } else if (this.touchEvent.isSwipeLeft()) {
+        element.rotation.y += sensitivity * -1;
+      }
+    });
 
   }
 
