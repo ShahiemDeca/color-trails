@@ -54,9 +54,9 @@ export default class GameMode {
     document.addEventListener('quit-game', this.toggleQuit.bind(this));
 
     // Events for desktop
-    document.addEventListener('mousedown', this.startDragging.bind(this));
-    document.addEventListener('mouseup', this.stopDragging.bind(this));
-    document.addEventListener('mousemove', this.movePlatform.bind(this));
+    // document.addEventListener('mousedown', this.startDragging.bind(this));
+    // document.addEventListener('mouseup', this.stopDragging.bind(this));
+    // document.addEventListener('mousemove', this.movePlatform.bind(this));
 
     // Touch events for mobile devices
     document.addEventListener('touchstart', this.startDragging.bind(this), { passive: false });
@@ -145,35 +145,41 @@ export default class GameMode {
   }
 
   public platformUnderMouse(clientX: number, clientY: number) {
-    const mouse = new Vector2();
-    mouse.x = (clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(clientY / window.innerHeight) * 2 + 1;
 
-    const raycaster = new Raycaster();
-    raycaster.setFromCamera(mouse, this.camera);
-
-    const intersects = raycaster.intersectObjects(this.platforms.obstacles);
-    if (intersects.length > 0) return intersects[0].object;
-
-    return null;
+    return this.platforms.obstacles[0];
   }
 
   public movePlatform(event: any) {
     const platform = this.platformUnderMouse(event.clientX, event.clientY);
-    if (!platform) return;
 
-    const platformCenterX = (platform.position.x + platform.geometry.parameters.width) / 2;
-    const mouseDirection = (event.clientX - platformCenterX) > 0 ? 1 : -1;
-alert(1)
-    if (this.isPlatformRotating) {
-      alert(2)
-      const sensitivity = 0.03; // Adjust the sensitivity for rotation
-      const deltaRotation = (event.movementX || event.mozMovementX || event.webkitMovementX || 0) * sensitivity;
+    // Check if platform is not undefined
+    if (platform) {
+      const platformCenterX = window.innerWidth / 2;
+      const mouseDirection = (event.touches[0].clientX  - platformCenterX) > 0 ? 1 : -1;
 
-      if (this.platforms.obstacles[0]) {
-        this.platforms.obstacles[0].rotation.y += deltaRotation * -mouseDirection;
-      }
+      console.log(mouseDirection)
+      const sensitivity = 0.06; // Adjust the sensitivity for rotation
+
+      // Check if platform.rotation is not NaN before updating
+        platform.rotation.y += sensitivity * mouseDirection;
+
+      //   console.log(-mouseDirection)
+      // }
     }
+
+    //     const platform = this.platformUnderMouse(event.clientX, event.clientY);
+    //     // if (!platform) return;
+    // console.log(platform)
+    //     const platformCenterX = (platform.position.x + window.innerWidth) / 2;
+    //     const mouseDirection = (event.clientX - platformCenterX) > 0 ? 1 : -1;
+    //     // if (this.isPlatformRotating) {
+    //       const sensitivity = 0.03; // Adjust the sensitivity for rotation
+    //       const deltaRotation = (event.movementX || event.mozMovementX || event.webkitMovementX || 0) * sensitivity;
+
+    //       //   if (this.platforms.obstacles[0]) 
+    //       platform.rotation.y += deltaRotation * -mouseDirection;
+    //       // }
+    //     // }
   }
 
   public onGameEnd() {
@@ -228,7 +234,7 @@ alert(1)
       const increasedFallDelay = 0.01 * Math.floor(currentScore / 5); // Increase delay every 10 points
       this.initialBallFallDelay = this.initialBallFallDelay - increasedFallDelay;
 
-      this.ball.drop(totalSpeed);
+      // this.ball.drop(totalSpeed);
       this.ball.handlePlatformCollision({ platforms: this.platforms, scene: this.scene });
 
       if (this.ball.isIntersected) {
