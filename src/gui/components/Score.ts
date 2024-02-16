@@ -4,10 +4,10 @@ import { PauseScreen } from "../PauseScreen";
 import settings from '../../assets/settings.png';
 
 @customElement('my-score')
-class Score extends LitElement {
+export class Score extends LitElement {
   @property({ type: Number }) score = 0;
 
-  render() {
+  public render() {
     return html`
       <header class="header">
         <div @click=${this.onPause} class="wheel"><img src=${settings} alt="Pause"></div>

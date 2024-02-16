@@ -131,6 +131,7 @@ export default class GameMode {
     this.isPaused = false;
     this.mismatchesCount = 0;
     this.gameModeScreen.score = 0;
+    this.gameModeScreen.hp = 3;
     this.initialBallFallDelay = config.ballFallDelay;
 
     this.toggleSceneVisibility();
@@ -257,7 +258,7 @@ export default class GameMode {
 
     if (this.ball?.isBallDropping) {
       const currentScore = this.gameModeScreen.score;
-      const increasedSpeed = 0.04 * Math.floor(currentScore / 5); // Increase speed every 5 points
+      const increasedSpeed = 0.01 * Math.floor(currentScore / 5); // Increase speed every 5 points
       const totalSpeed = increasedSpeed + this.ballSpeed;
       const increasedFallDelay = 0.01 * Math.floor(currentScore / 5); // Increase delay every 10 points
       this.initialBallFallDelay = this.initialBallFallDelay - increasedFallDelay;
@@ -282,6 +283,10 @@ export default class GameMode {
           this.ball.isMatch = false;
         } else {
           this.mismatchesCount += 1;
+          this.gameModeScreen.hp -= 1;
+
+          this.gameModeScreen.requestUpdate('hp', 0);
+
           if (this.mismatchesCount >= this.mismatchesThreshold) this.onGameEnd();
         }
       }

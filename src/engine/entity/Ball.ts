@@ -11,7 +11,7 @@ export default class Ball {
   public isMatch: boolean = false;
 
   public render(scene: Scene) {
-    const geometry = new SphereGeometry(3, 10, 32);
+    const geometry = new SphereGeometry(2, 10, 32);
     const material = new MeshPhongMaterial({
       color: config.colors[Math.floor(Math.random() * config.colors.length)],
     });
