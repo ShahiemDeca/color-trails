@@ -13,20 +13,18 @@ To get started to run Color Trails, follow these steps:
 
 1. Clone the repository to your local machine:
 
-   ```bash
    git clone https://github.com/your-username/color-trails.git
 
 2. cd color-trails
 
 3. Install the project dependencies
-   ```bash
+
 npm install
 
 ## Development
 
 For development, you can run the project in a development environment using the following command:
 
-   ```bash
    npm run dev
 
 ## Build
