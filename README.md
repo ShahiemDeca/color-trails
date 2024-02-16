@@ -5,7 +5,8 @@ Your mission is to guide the bouncing ball through the helix tower. But here's t
 ## Table of Contents
 
 - [Installation](#installation)
-- [Development](#usage)
+- [Build](#build)
+- [Development](#development)
 
 ## Installation
 
