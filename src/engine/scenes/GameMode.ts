@@ -8,7 +8,7 @@ import Platform from "../entity/Platform";
 import Score from "./Score";
 
 class TouchEvent {
-  static SWIPE_THRESHOLD = 50; // Minimum difference in pixels at which a swipe gesture is detected
+  static SWIPE_THRESHOLD = 0; // Minimum difference in pixels at which a swipe gesture is detected
 
   static SWIPE_LEFT = 1;
   static SWIPE_RIGHT = 2;
@@ -230,19 +230,18 @@ export default class GameMode {
   public movePlatform(event: any) {
     // const platform = this.platformUnderMouse(event.clientX, event.clientY);
     // if (!platform) return;
+    this.touchEvent.setEndEvent(event);
 
     this.platforms.obstacles.forEach(element => {
 
-      this.touchEvent.setEndEvent(event);
 
-      const sensitivity = 0.07;
+      const sensitivity = 0.05;
       if (this.touchEvent.isSwipeRight()) {
         element.rotation.y += sensitivity * 1;
       } else if (this.touchEvent.isSwipeLeft()) {
         element.rotation.y += sensitivity * -1;
       }
     });
-
   }
 
   public onGameEnd() {
