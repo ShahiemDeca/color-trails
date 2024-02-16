@@ -9,10 +9,10 @@ class Score extends LitElement {
 
   render() {
     return html`
-      <div class="header">
+      <header class="header">
         <div @click=${this.onPause} class="wheel"><img src=${settings} alt="Pause"></div>
         <div class="level">${this.score}</div>
-      </div>
+      </header>
     `;
   }
 

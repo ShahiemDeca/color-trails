@@ -7,6 +7,7 @@ import Ball from "../entity/Ball";
 import Platform from "../entity/Platform";
 import Score from "./Score";
 import hyper from '../../assets/hyper.mp3';
+import Game from "../Game";
 
 class TouchEvent {
   static SWIPE_THRESHOLD = 0; // Minimum difference in pixels at which a swipe gesture is detected
@@ -100,6 +101,7 @@ export default class GameMode {
   private readonly mismatchesThreshold: number = 3;
   isGameEnded: boolean = false;
   touchEvent: TouchEvent;
+  audioLoader: any;
 
   constructor() {
     this.scene = new Scene();
@@ -108,15 +110,11 @@ export default class GameMode {
     this.platforms = new Platform();
     this.ball = new Ball();
     this.gameModeScreen = new GameModeScreen();
+  }
 
-    // const sound = new Howl({
-    //   src: ['../../assets/hyper.mp3'],
-    //   volume: 0.4
-    // });
-
+  public loadAudio() {
     const listener = new AudioListener();
     this.camera.add(listener);
-
 
     const sound = new Audio(listener);
 
@@ -128,6 +126,7 @@ export default class GameMode {
       sound.play();
     });
 
+    this.audioLoader = sound;
   }
 
   public startDragging(event: TouchEvent) {
@@ -143,6 +142,7 @@ export default class GameMode {
     window.addEventListener('resize', this.handleResize.bind(this));
 
     // Game events
+    document.addEventListener('audio-toggle', this.toggleAudio.bind(this));
     document.addEventListener('pause-game', this.togglePause.bind(this));
     document.addEventListener('reset-game', this.toggleReset.bind(this));
     document.addEventListener('quit-game', this.toggleQuit.bind(this));
@@ -164,6 +164,8 @@ export default class GameMode {
   public toggleQuit() {
     document.body.removeChild(this.renderer.domElement);
 
+    if (this.audioLoader)
+      this.audioLoader.stop();
     // Reset the game state
     // this.isGameEnded = false;
     // this.isPaused = false;
@@ -189,6 +191,20 @@ export default class GameMode {
     this.setGameInterface();
   }
 
+  public setAudio() {
+    if (!this.audioLoader) return;
+
+    if (this.isPaused || !Game.audioEnabled) {
+      this.audioLoader.stop();
+    } else {
+      this.audioLoader.play();
+    }
+  }
+
+  public toggleAudio() {
+    this.setAudio();
+  }
+
   public togglePause() {
     this.isPaused = !this.isPaused;
 
@@ -199,6 +215,8 @@ export default class GameMode {
     } else {
       this.renderer.render(this.scene, this.camera);
     }
+
+    this.setAudio();
   }
 
   public toggleSceneVisibility() {
@@ -265,9 +283,7 @@ export default class GameMode {
   }
 
   public start() {
-
-    // sound.play();
-
+    this.loadAudio();
     this.setGameInterface();
     this.setEventListners();
     this.setCamera();
@@ -304,8 +320,8 @@ export default class GameMode {
 
     if (this.ball?.isBallDropping) {
       const currentScore = this.gameModeScreen.score;
-      // const increasedSpeed = 0.2 * Math.floor(currentScore / 5); // Increase speed every 5 points
-      const totalSpeed = this.ballSpeed;
+      const increasedSpeed = 0.04 * Math.floor(currentScore / 5); // Increase speed every 5 points
+      const totalSpeed = increasedSpeed + this.ballSpeed;
       const increasedFallDelay = 0.01 * Math.floor(currentScore / 5); // Increase delay every 10 points
       this.initialBallFallDelay = this.initialBallFallDelay - increasedFallDelay;
 
