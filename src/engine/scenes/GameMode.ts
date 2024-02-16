@@ -8,7 +8,6 @@ import Platform from "../entity/Platform";
 import Score from "./Score";
 import hyper from '../../assets/hyper.mp3';
 import Game from "../Game";
-import TouchEvent from "../TouchEvent";
 
 export default class GameMode {
 
@@ -33,8 +32,9 @@ export default class GameMode {
   private mismatchesCount: number = 0;
 
   private readonly mismatchesThreshold: number = 3;
-  private touchEvent: TouchEvent;
   private audio: Audio;
+  touchStartX: any;
+  touchStartY: any;
 
   constructor() {
     this.scene = new Scene();
@@ -62,13 +62,41 @@ export default class GameMode {
     this.audio = sound;
   }
 
-  public startDragging(event: TouchCustomEvents) {
+  public startDragging(event: any) {
     this.isPlatformRotating = true;
-    this.touchEvent = new TouchEvent(event, null);
+    this.touchStartX = event.touches[0].clientX;
+    this.touchStartY = event.touches[0].clientY;
   }
 
-  public stopDragging() {
+  public stopDragging(event: any) {
     this.isPlatformRotating = false;
+
+    // Calculate the distance moved during the touch
+    const touchEndX = event.changedTouches[0].clientX;
+    const touchEndY = event.changedTouches[0].clientY;
+    const distanceX = touchEndX - this.touchStartX;
+    const distanceY = touchEndY - this.touchStartY;
+
+    // Check if the touch was a tap (small movement)
+    const tapThreshold = 5; // Adjust this threshold based on your needs
+    if (Math.abs(distanceX) < tapThreshold && Math.abs(distanceY) < tapThreshold) {
+      // It's a tap, handle the tap event
+      this.handleTap();
+    }
+
+    // Reset the initial touch position
+    this.touchStartX = null;
+    this.touchStartY = null;
+  }
+
+  private handleTap() {
+    // Add your logic for handling the tap event here
+    console.log('Tap detected!');
+    const sensitivity = 0.1;
+    this.platforms.obstacles.forEach(element => {
+      console.log(element.children[0])
+      element.rotation.y += 1.24;
+    });
   }
 
   public setEventListners() {
@@ -178,16 +206,7 @@ export default class GameMode {
   }
 
   public movePlatform(event: any) {
-    this.touchEvent.setEndEvent(event);
 
-    const sensitivity = 0.1;
-    this.platforms.obstacles.forEach(element => {
-      if (this.touchEvent.isSwipeRight()) {
-        element.rotation.y += sensitivity * 1;
-      } else if (this.touchEvent.isSwipeLeft()) {
-        element.rotation.y += sensitivity * -1;
-      }
-    });
   }
 
   public onGameEnd() {
