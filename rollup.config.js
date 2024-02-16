@@ -5,6 +5,7 @@ import postcssUrl from "postcss-url";
 import copy from "rollup-plugin-copy";
 import { terser } from "rollup-plugin-terser";
 import url from "rollup-plugin-url";
+
 export default {
 	input: "src/index.ts",
 	output: {

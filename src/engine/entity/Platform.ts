@@ -1,21 +1,16 @@
 import config from '@src/config';
 import { MeshPhongMaterial, Scene, Mesh, CylinderGeometry, Group, Object3D } from 'three';
 
-interface PlatformInfo {
-  positionY: number;
-}
-
 export default class Platform {
-  amount: number = 0;
-  platforms: any = [];
-  obstacles: any = [];
 
-  private createPlatformInfo(amount: number): PlatformInfo[] {
-    const platforms: PlatformInfo[] = [];
+  public platforms: { positionY: number }[] = [];
+  public obstacles: Group[] = [];
+
+  private createPlatformInfo(amount: number) {
+    const platforms = [];
 
     for (let i = 0; i < amount; i++) {
       const positionY = this.platforms.length * -config.platformStye.gap;
-
       platforms.push({ positionY });
       this.platforms.push({ positionY });
     }
@@ -23,18 +18,20 @@ export default class Platform {
     return platforms;
   }
 
-  private createPlatformObstacles(platformInfo: PlatformInfo): Group {
+  public shuffleColors(colors: string[]) {
+    return colors.map(value => ({ value, sort: Math.random() }))
+      .sort((a, b) => a.sort - b.sort)
+      .map(({ value }) => value);
+  }
+
+  private createPlatformObstacles(platformInfo: { positionY: number; }): Group {
     const obstaclesGroup = new Group();
     const numberOfPieces = config.colors.length;
     const piePieceAngle = (Math.PI * 2) / numberOfPieces;
-    const shuffledColors = config.colors
-      .map(value => ({ value, sort: Math.random() }))
-      .sort((a, b) => a.sort - b.sort)
-      .map(({ value }) => value);
+    const shuffledColors = this.shuffleColors(config.colors);
 
     for (let i = 0; i < numberOfPieces; i++) {
       const startingAngle = i * piePieceAngle;
-
       const platformGeometry = new CylinderGeometry(
         config.platformStye.radius,
         config.platformStye.radius,
@@ -49,26 +46,24 @@ export default class Platform {
       const platformMaterial = new MeshPhongMaterial({ color: shuffledColors[i] });
       const platformMesh = new Mesh(platformGeometry, platformMaterial);
       const platform = new Object3D();
-      platform.userData.index = obstaclesGroup.children.length;
       platform.add(platformMesh);
+
       Object.assign(platform, platformInfo);
       obstaclesGroup.add(platform);
     }
 
-    obstaclesGroup.userData.index = this.obstacles.length;
     obstaclesGroup.position.y = platformInfo.positionY;
-
     return obstaclesGroup;
   }
 
   public movePlatforms() {
-    this.platforms.forEach((platform: any) => platform.positionY += config.platformStye.gap);
-    this.obstacles.forEach((platform: any) => platform.position.y += config.platformStye.gap);
+    this.platforms.forEach((platform: { positionY: number }) => platform.positionY += config.platformStye.gap);
+    this.obstacles.forEach((obstacle: { position: { y: number } }) => obstacle.position.y += config.platformStye.gap);
   }
 
-  public removeFirst(scene: Scene) {
-    if(this.obstacles.length === 0) return;
-    
+  public removeFirstPlatform(scene: Scene) {
+    if (this.obstacles.length === 0) return;
+
     scene.remove(this.obstacles[0]);
 
     this.platforms.shift();
@@ -77,10 +72,9 @@ export default class Platform {
 
   public render({ amount, scene }: { amount: number; scene: Scene }) {
     const platformInfos = this.createPlatformInfo(amount);
-    platformInfos.forEach((platformInfo) => {
+    platformInfos.forEach((platformInfo): void => {
       const obstaclesGroup = this.createPlatformObstacles(platformInfo);
       this.obstacles.push(obstaclesGroup);
-
       scene.add(obstaclesGroup);
     });
   }

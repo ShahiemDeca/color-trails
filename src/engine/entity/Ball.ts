@@ -3,7 +3,7 @@ import { MeshPhongMaterial, SphereGeometry, Scene, Mesh, Color, Vector3, Sphere,
 
 export default class Ball {
 
-  public entity: any;
+  public entity: Mesh;
   public startPositionY: number = 20;
   public isBallDropping: boolean = false;
   public isIntersected: boolean = false;
@@ -16,14 +16,11 @@ export default class Ball {
       color: config.colors[Math.floor(Math.random() * config.colors.length)],
     });
 
-    console.log(config.colors[Math.floor(Math.random() * config.colors.length)])
     const entity = new Mesh(geometry, material);
     entity.position.set(0, this.startPositionY, 10);
 
     this.entity = entity;
-
     scene.add(entity);
-
   }
 
   public handleIntersection({ objects }: { objects: any }) {
@@ -50,14 +47,16 @@ export default class Ball {
     this.entity.material.color.set(new Color(color));
   }
 
-  public handlePlatformCollision({ platforms, scene }: { platforms: any, scene: any }) {
+  public handlePlatformCollision({ platforms }: { platforms: any }) {
     if (platforms.platforms.length === 0) return;
 
+    //cleanup
     const platform = platforms.obstacles[0];
     const obstacles = platform.children;
     const platformPosition = platforms.platforms[0].positionY + config.platformStye.height / 2;
 
     // todo: replace 3
+
     if (this.entity.position.y <= platformPosition + 3 && obstacles.length > 0) {
       this.isBallDropping = false;
       this.entity.position.y = platformPosition + 3;

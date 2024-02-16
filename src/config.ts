@@ -8,6 +8,7 @@ export default {
     'gray',
   ],
   ballFallDelay: 2,
+  ballSpeed: 0.2,
   platformStye: {
     radius: 18,
     height: 4,

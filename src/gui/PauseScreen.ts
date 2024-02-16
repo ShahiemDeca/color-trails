@@ -8,7 +8,6 @@ export class PauseScreen extends LitElement {
 
   @property({ type: Boolean }) audioStatus = true;
 
-
   public render() {
     return html`
     <div class="app">
@@ -51,6 +50,7 @@ export class PauseScreen extends LitElement {
   private onQuitGame() {
     document.dispatchEvent(new CustomEvent('quit-game'));
 
+    // Show homescreen when quiting game
     const homeScreen = new HomeScreen();
     render(homeScreen, document.getElementById('app'));
   }

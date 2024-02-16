@@ -1,0 +1,3 @@
+interface TouchCustomEvents {
+  changedTouches: Touch[];
+}

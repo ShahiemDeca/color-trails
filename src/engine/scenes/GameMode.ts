@@ -1,6 +1,6 @@
 import GameModeScreen from "@src/gui/GameModeScreen";
 import { render } from "lit-html";
-import { Scene, PerspectiveCamera, WebGLRenderer, Vector2, Raycaster, Audio, AudioListener, AudioLoader, DirectionalLight, AmbientLight, Mesh } from 'three';
+import { Scene, PerspectiveCamera, WebGLRenderer, Audio, AudioListener, AudioLoader, DirectionalLight, AmbientLight, Mesh } from 'three';
 import config from '../../config';
 import Cylinder from "../entity/Cylinder";
 import Ball from "../entity/Ball";
@@ -8,77 +8,7 @@ import Platform from "../entity/Platform";
 import Score from "./Score";
 import hyper from '../../assets/hyper.mp3';
 import Game from "../Game";
-
-class TouchEvent {
-  static SWIPE_THRESHOLD = 0; // Minimum difference in pixels at which a swipe gesture is detected
-
-  static SWIPE_LEFT = 1;
-  static SWIPE_RIGHT = 2;
-  static SWIPE_UP = 3;
-  static SWIPE_DOWN = 4;
-  startEvent: any;
-  endEvent: any;
-
-  constructor(startEvent, endEvent) {
-    this.startEvent = startEvent;
-    this.endEvent = endEvent || null;
-  }
-
-  isSwipeLeft() {
-    return this.getSwipeDirection() == TouchEvent.SWIPE_LEFT;
-  }
-
-  isSwipeRight() {
-    return this.getSwipeDirection() == TouchEvent.SWIPE_RIGHT;
-  }
-
-  isSwipeUp() {
-    return this.getSwipeDirection() == TouchEvent.SWIPE_UP;
-  }
-
-  isSwipeDown() {
-    return this.getSwipeDirection() == TouchEvent.SWIPE_DOWN;
-  }
-
-  getSwipeDirection() {
-    if (!this.startEvent.changedTouches || !this.endEvent.changedTouches) {
-      return null;
-    }
-
-    let start = this.startEvent.changedTouches[0];
-    let end = this.endEvent.changedTouches[0];
-
-    if (!start || !end) {
-      return null;
-    }
-
-    let horizontalDifference = start.screenX - end.screenX;
-    let verticalDifference = start.screenY - end.screenY;
-
-    // Horizontal difference dominates
-    if (Math.abs(horizontalDifference) > Math.abs(verticalDifference)) {
-      if (horizontalDifference >= TouchEvent.SWIPE_THRESHOLD) {
-        return TouchEvent.SWIPE_LEFT;
-      } else if (horizontalDifference <= -TouchEvent.SWIPE_THRESHOLD) {
-        return TouchEvent.SWIPE_RIGHT;
-      }
-
-      // Vertical or no difference dominates
-    } else {
-      if (verticalDifference >= TouchEvent.SWIPE_THRESHOLD) {
-        return TouchEvent.SWIPE_UP;
-      } else if (verticalDifference <= -TouchEvent.SWIPE_THRESHOLD) {
-        return TouchEvent.SWIPE_DOWN;
-      }
-    }
-
-    return null;
-  }
-
-  setEndEvent(endEvent) {
-    this.endEvent = endEvent;
-  }
-}
+import TouchEvent from "../TouchEvent";
 
 export default class GameMode {
 
@@ -86,22 +16,25 @@ export default class GameMode {
   public isPlatformRotating: boolean = false;
   public gameModeScreen: GameModeScreen;
 
-  private ballSpeed: number = 0.2;
-  private initialBallFallDelay: number = config.ballFallDelay; // Initial ball fall delay
+  private ballSpeed: number = config.ballSpeed;
+  private initialBallFallDelay: number = config.ballFallDelay;
+
   private scene: Scene;
   private camera: PerspectiveCamera;
   private renderer: WebGLRenderer;
   private startTime: number = performance.now();
   private ball: Mesh;
   private platforms: Platform;
-  isPaused: boolean = false;
 
+  private isPaused: boolean = false;
   private isSceneHidden: boolean = false;
+  private isGameEnded: boolean = false;
+
   private mismatchesCount: number = 0;
+
   private readonly mismatchesThreshold: number = 3;
-  isGameEnded: boolean = false;
-  touchEvent: TouchEvent;
-  audioLoader: any;
+  private touchEvent: TouchEvent;
+  private audio: Audio;
 
   constructor() {
     this.scene = new Scene();
@@ -126,10 +59,10 @@ export default class GameMode {
       sound.play();
     });
 
-    this.audioLoader = sound;
+    this.audio = sound;
   }
 
-  public startDragging(event: TouchEvent) {
+  public startDragging(event: TouchCustomEvents) {
     this.isPlatformRotating = true;
     this.touchEvent = new TouchEvent(event, null);
   }
@@ -146,14 +79,9 @@ export default class GameMode {
     document.addEventListener('pause-game', this.togglePause.bind(this));
     document.addEventListener('reset-game', this.toggleReset.bind(this));
     document.addEventListener('quit-game', this.toggleQuit.bind(this));
-    document.addEventListener('touchmove', function (e) {
-      e.preventDefault();
-    }, { passive: false });
 
-    // Events for desktop
-    // document.addEventListener('mousedown', this.startDragging.bind(this));
-    // document.addEventListener('mouseup', this.stopDragging.bind(this));
-    // document.addEventListener('mousemove', this.movePlatform.bind(this));
+    // Disable touch event
+    document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
 
     // Touch events for mobile devices
     document.addEventListener('touchstart', this.startDragging.bind(this));
@@ -164,17 +92,7 @@ export default class GameMode {
   public toggleQuit() {
     document.body.removeChild(this.renderer.domElement);
 
-    if (this.audioLoader)
-      this.audioLoader.stop();
-    // Reset the game state
-    // this.isGameEnded = false;
-    // this.isPaused = false;
-    // this.mismatchesCount = 0;
-    // this.gameModeScreen.score = 0;
-    // this.initialBallFallDelay = config.ballFallDelay;
-
-    // this.toggleSceneVisibility();
-    // this.setGameInterface();
+    if (this.audio) this.audio.stop();
   }
 
   public toggleReset() {
@@ -192,12 +110,12 @@ export default class GameMode {
   }
 
   public setAudio() {
-    if (!this.audioLoader) return;
+    if (!this.audio) return;
 
     if (this.isPaused || !Game.audioEnabled) {
-      this.audioLoader.stop();
+      this.audio.stop();
     } else {
-      this.audioLoader.play();
+      this.audio.play();
     }
   }
 
@@ -330,7 +248,7 @@ export default class GameMode {
 
       if (this.ball.isIntersected) {
         this.platforms.movePlatforms();
-        this.platforms.removeFirst(this.scene);
+        this.platforms.removeFirstPlatform(this.scene);
 
         this.addPlatform({ amount: 1 });
 
