@@ -1,4 +1,3 @@
-import Splash from "@src/engine/scenes/Splash";
 import { LitElement, html } from "lit";
 import { customElement } from 'lit/decorators.js';
 

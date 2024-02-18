@@ -11,19 +11,18 @@ import Game from "../Game";
 
 export default class GameMode {
 
-  public ballStartPositionY: number = 20;
   public isPlatformRotating: boolean = false;
-  public gameModeScreen: GameModeScreen;
 
-  private ballSpeed: number = config.ballSpeed;
-  private initialBallFallDelay: number = config.ballFallDelay;
+  private startTime: number = performance.now();
 
+  private gameModeScreen: GameModeScreen;
   private scene: Scene;
   private camera: PerspectiveCamera;
   private renderer: WebGLRenderer;
-  private startTime: number = performance.now();
+  
   private ball: Mesh;
   private platforms: Platform;
+  private audio: Audio;
 
   private isPaused: boolean = false;
   private isSceneHidden: boolean = false;
@@ -31,8 +30,10 @@ export default class GameMode {
 
   private mismatchesCount: number = 0;
 
+  private initialBallFallDelay: number = config.ballFallDelay;
   private readonly mismatchesThreshold: number = 3;
-  private audio: Audio;
+  private readonly ballSpeed: number = config.ballSpeed;
+
   private touchStartX: number = 0;
   private touchStartY: number = 0;
 
@@ -50,9 +51,8 @@ export default class GameMode {
     this.camera.add(listener);
 
     const sound = new Audio(listener);
-
     const audioLoader = new AudioLoader();
-    audioLoader.load(hyper, function (buffer) {
+    audioLoader.load(hyper, (buffer) => {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.5);
@@ -62,14 +62,17 @@ export default class GameMode {
     this.audio = sound;
   }
 
-  public startDragging(event: any) {
+  public startDragging(event: TouchEvent) {
+    if (event.touches.length === 0) return;
+
     this.isPlatformRotating = true;
     this.touchStartX = event.touches[0].clientX;
     this.touchStartY = event.touches[0].clientY;
   }
 
-  public stopDragging(event: any) {
-    // Calculate the distance moved during the touch
+  public stopDragging(event: TouchEvent) {
+    if (event.changedTouches.length === 0) return;
+
     const touchEndX = event.changedTouches[0].clientX;
     const touchEndY = event.changedTouches[0].clientY;
     const distanceX = touchEndX - this.touchStartX;
@@ -88,12 +91,15 @@ export default class GameMode {
   }
 
   private handleTap() {
-    // Add your logic for handling the tap event here
-    console.log('Tap detected!');
-    const sensitivity = 0.1;
-    this.platforms.obstacles.forEach(element => {
-      console.log(element.children[0])
-      element.rotation.y += 1.24;
+    const numberOfPieces = config.colors.length;
+    const piePieceAngle = (Math.PI * 2) / numberOfPieces;
+
+    this.platforms.obstacles.forEach((segment, index) => {
+      const startingAngle = index * piePieceAngle;
+
+      // Rotate to the center of the segment
+      const centerAngle = startingAngle + piePieceAngle;
+      segment.rotation.y += centerAngle;
     });
   }
 
@@ -264,6 +270,7 @@ export default class GameMode {
       this.ball.drop(totalSpeed);
       this.ball.handlePlatformCollision({ platforms: this.platforms, scene: this.scene });
 
+      // Check if the ball is intersecting with the platform
       if (this.ball.isIntersected) {
         this.platforms.movePlatforms();
         this.platforms.removeFirstPlatform(this.scene);
@@ -271,20 +278,18 @@ export default class GameMode {
         this.addPlatform({ amount: 1 });
 
         this.ball.changeColor();
-        this.ball.reset();
+        this.ball.reset(); // Reset back to starting postion
         this.ball.isIntersected = false;
 
         if (this.ball.isMatch) {
           this.gameModeScreen.score += 1;
           this.gameModeScreen.requestUpdate('score', 0);
-
           this.ball.isMatch = false;
         } else {
-          this.mismatchesCount += 1;
           this.gameModeScreen.hp -= 1;
-
           this.gameModeScreen.requestUpdate('hp', 0);
 
+          this.mismatchesCount += 1;
           if (this.mismatchesCount >= this.mismatchesThreshold) this.onGameEnd();
         }
       }
