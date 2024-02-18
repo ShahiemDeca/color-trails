@@ -32,6 +32,9 @@ export default class Platform {
 
     for (let i = 0; i < numberOfPieces; i++) {
       const startingAngle = i * piePieceAngle;
+
+      const centerAngle = startingAngle + piePieceAngle / 2;
+
       const platformGeometry = new CylinderGeometry(
         config.platformStye.radius,
         config.platformStye.radius,
@@ -39,20 +42,18 @@ export default class Platform {
         32,
         1,
         false,
-        startingAngle,
+        centerAngle,
         piePieceAngle
       );
 
       const platformMaterial = new MeshPhongMaterial({ color: shuffledColors[i] });
       const platformMesh = new Mesh(platformGeometry, platformMaterial);
       const platform = new Object3D();
-
       platform.add(platformMesh);
 
       Object.assign(platform, platformInfo);
       obstaclesGroup.add(platform);
     }
-
     obstaclesGroup.position.y = platformInfo.positionY;
     return obstaclesGroup;
   }

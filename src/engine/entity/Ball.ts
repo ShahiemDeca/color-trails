@@ -4,14 +4,15 @@ import { MeshPhongMaterial, SphereGeometry, Scene, Mesh, Color, Vector3, Sphere,
 export default class Ball {
 
   public entity: Mesh;
-  public startPositionY: number = 20;
+  public startPositionY: number = 30;
   public isBallDropping: boolean = false;
   public isIntersected: boolean = false;
   public isFirstFall: boolean = true;
   public isMatch: boolean = false;
 
   public render(scene: Scene) {
-    const geometry = new SphereGeometry(2, 10, 32);
+    const ballWidth = 2.5;
+    const geometry = new SphereGeometry(ballWidth, 10, 32);
     const material = new MeshPhongMaterial({
       color: config.colors[Math.floor(Math.random() * config.colors.length)],
     });
@@ -23,9 +24,9 @@ export default class Ball {
     scene.add(entity);
   }
 
-  public handleIntersection({ objects }: { objects: any }) {
-    objects.forEach(object => {
-      const platformColor = object.material.color.getHex();
+  public handleIntersection({ segments }: { segments: any[]}) {
+    segments.forEach(segment => {
+      const platformColor = segment.material.color.getHex();
       const currentBallColor = this.entity.material.color.getHex();
       if (platformColor === currentBallColor) this.isMatch = true;
     });
@@ -50,16 +51,14 @@ export default class Ball {
   public handlePlatformCollision({ platforms }: { platforms: any }) {
     if (platforms.platforms.length === 0) return;
 
-    //cleanup
     const platform = platforms.obstacles[0];
     const obstacles = platform.children;
     const platformPosition = platforms.platforms[0].positionY + config.platformStye.height / 2;
 
-    // todo: replace 3
-
-    if (this.entity.position.y <= platformPosition + 3 && obstacles.length > 0) {
+    const platformY = platformPosition + 3;
+    if (this.entity.position.y <= platformY && obstacles.length > 0) {
       this.isBallDropping = false;
-      this.entity.position.y = platformPosition + 3;
+      this.entity.position.y = platformY;
 
       // Handle intersection with platform
       const ballPosition = new Vector3();
@@ -67,6 +66,7 @@ export default class Ball {
 
       const ballBoundingSphere = new Sphere(ballPosition, this.entity.geometry.parameters.radius);
 
+      // Check if the ball is intersecting with the platform
       const raycaster = new Raycaster();
       raycaster.set(ballBoundingSphere.center, new Vector3(0, -1, 0));
 
@@ -75,10 +75,10 @@ export default class Ball {
 
       const intersectsRight = raycaster.intersectObjects(obstacles);
 
-      const leftObject = intersectsLeft.length > 0 ? intersectsLeft[0].object : null;
-      const rightObject = intersectsRight.length > 0 ? intersectsRight[0].object : null;
+      const leftSegment = intersectsLeft.length > 0 ? intersectsLeft[0].object : null;
+      const rightSegment = intersectsRight.length > 0 ? intersectsRight[0].object : null;
 
-      this.handleIntersection({ objects: [leftObject, rightObject] });
+      if (leftSegment && rightSegment) this.handleIntersection({ segments: [leftSegment, rightSegment] });
     }
   }
 }
