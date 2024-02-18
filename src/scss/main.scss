@@ -2,7 +2,6 @@ body {
   margin: 0;
   font-family: "Baloo Paaji 2", sans-serif;
   color: #bc93ff;
-  background-image: url("../assets/bg.jpg");
   background-size: 100% 100%;
 }
 
@@ -58,17 +57,13 @@ button {
 }
 
 .app {
-  background-image: url("../assets/bg.jpg");
+  background-image: url("../assets/bg_splash.jpg");
   background-size: 100% 100%;
   width: 100%;
   height: 100%;
   position: absolute;
   display: flex;
   flex-direction: column;
-
-  &.is-splash {
-    background-image: url("../assets/bg_splash.jpg");
-  }
 }
 
 .header {
@@ -223,6 +218,20 @@ button {
 
 .logo {
   max-width: 300px;
+
+  &.is-animated {
+    filter: grayscale(100%);
+    animation: grayscaleAnimation 2s ease-out;
+  }
+}
+
+@keyframes grayscaleAnimation {
+  from {
+    filter: grayscale(100%);
+  }
+  to {
+    filter: grayscale(0%);
+  }
 }
 
 .footer {
